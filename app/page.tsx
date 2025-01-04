@@ -1,16 +1,38 @@
-import Hero from "@/components/hero";
-import ConnectSupabaseSteps from "@/components/tutorial/connect-supabase-steps";
-import SignUpUserSteps from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/utils/supabase/check-env-vars";
+"use client"
 
-export default async function Home() {
+import { useState } from "react"
+import { SignIn } from "@/components/auth/sign-in"
+import { SignUp } from "@/components/auth/sign-up"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+export default function Home() {
+  const [isSignIn, setIsSignIn] = useState(true)
+
   return (
-    <>
-      <Hero />
-      <main className="flex-1 flex flex-col gap-6 px-4">
-        <h2 className="font-medium text-xl mb-4">Next steps</h2>
-        {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
-      </main>
-    </>
-  );
+    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>{isSignIn ? "Sign In" : "Sign Up"}</CardTitle>
+          <CardDescription>
+            {isSignIn
+              ? "Enter your credentials to access your account"
+              : "Create a new account to get started"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isSignIn ? <SignIn /> : <SignUp />}
+          <div className="mt-4 text-center">
+            <Button
+              variant="link"
+              onClick={() => setIsSignIn(!isSignIn)}
+            >
+              {isSignIn ? "Need an account? Sign Up" : "Already have an account? Sign In"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
 }
+
