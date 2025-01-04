@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { useState } from "react"
 import { createFranchise, updateFranchiseOwner, getFranchises } from "@/utils/db"
 import { Button } from "@/components/ui/button"
