@@ -50,6 +50,60 @@ export function InventoryManagement({ inventoryItems, franchises }: { inventoryI
 
   return (
     <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Inventory Items</h2>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>Add Item</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Inventory Item</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleCreateItem} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  value={newItem.name}
+                  onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Input
+                  id="description"
+                  value={newItem.description}
+                  onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                  required
+                />
+              </div>
+              <Button type="submit">Create Item</Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {inventoryItems.map((item) => (
+            <TableRow key={item.id}>
+              <TableCell>{item.name}</TableCell>
+              <TableCell>{item.description}</TableCell>
+              <TableCell>
+                <Button variant="outline" size="sm">Edit</Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
       <div className="mt-8">
         <h3 className="text-lg font-semibold mb-4">Assign Items to Franchise</h3>
         <form onSubmit={handleAssignItem} className="space-y-4">
@@ -106,61 +160,6 @@ export function InventoryManagement({ inventoryItems, franchises }: { inventoryI
           <Button type="submit">Assign Item</Button>
         </form>
       </div>
-
-      {/* <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Inventory Items</h2>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>Add Item</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Inventory Item</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleCreateItem} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  value={newItem.name}
-                  onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Input
-                  id="description"
-                  value={newItem.description}
-                  onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                  required
-                />
-              </div>
-              <Button type="submit">Create Item</Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {inventoryItems.map((item) => (
-            <TableRow key={item.id}>
-              <TableCell>{item.name}</TableCell>
-              <TableCell>{item.description}</TableCell>
-              <TableCell>
-                <Button variant="outline" size="sm">Edit</Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table> */}
     </div>
   )
 }

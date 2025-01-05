@@ -143,7 +143,6 @@ export async function recordInventoryUsage(
   date: string
 ) {
   try {
-    // Start a Supabase transaction
     const { data, error } = await supabase.rpc('record_inventory_usage', {
       p_franchise_id: franchiseId,
       p_item_id: itemId,
@@ -228,8 +227,9 @@ export async function updateFranchiseOwner(franchiseId: string, ownerEmail: stri
 
 export async function getRealTimeInventory(franchiseId: string) {
   try {
-    const { data, error } = await supabase
-      .rpc('get_real_time_inventory', { p_franchise_id: franchiseId })
+    const { data, error } = await supabase.rpc('get_real_time_inventory', {
+      p_franchise_id: franchiseId
+    })
     
     if (error) throw error
     return data
@@ -238,4 +238,58 @@ export async function getRealTimeInventory(franchiseId: string) {
     throw error
   }
 }
+
+export async function fulfillInventoryRequest(requestId: string, fulfilledQuantity: number) {
+  try {
+    const { data, error } = await supabase.rpc('fulfill_inventory_request', {
+      p_request_id: requestId,
+      p_fulfilled_quantity: fulfilledQuantity
+    })
+    
+    if (error) throw error
+    return data
+  } catch (error) {
+    console.error('Error fulfilling inventory request:', error)
+    throw error
+  }
+}
+
+export async function getDayWiseInventoryUsage(franchiseId: string, startDate: string, endDate: string) {
+  try {
+    const { data, error } = await supabase.rpc('get_day_wise_inventory_usage', {
+      p_franchise_id: franchiseId,
+      p_start_date: startDate,
+      p_end_date: endDate
+    })
+    
+    if (error) throw error
+
+    // Convert BIGINT to number for JavaScript compatibility
+    return data.map((item: { quantity_used: string | number }) => ({
+      ...item,
+      quantity_used: Number(item.quantity_used)
+    }))
+  } catch (error) {
+    console.error('Error fetching day-wise inventory usage:', error)
+    throw error
+  }
+}
+
+// export {
+//   getFranchises,
+//   createFranchise,
+//   getInventoryItems,
+//   createInventoryItem,
+//   updateInventoryItem,
+//   deleteInventoryItem,
+//   getFranchiseInventory,
+//   updateFranchiseInventory,
+//   recordInventoryUsage,
+//   createInventoryRequest,
+//   updateInventoryRequestStatus,
+//   updateFranchiseOwner,
+//   getRealTimeInventory,
+//   fulfillInventoryRequest,
+//   getDayWiseInventoryUsage
+// }
 

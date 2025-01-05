@@ -1,4 +1,5 @@
 //@ts-nocheck
+
 "use client"
 
 import { useState, useEffect } from "react"
@@ -12,6 +13,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from 'lucide-react'
 import { supabase } from "@/utils/supabase"
 import { useToast } from "@/components/ui/use-toast"
+import { DayWiseInventoryUsage } from "./day-wise-inventory-usage"
 
 export function AdminDashboard({ user }: { user: any }) {
   const [franchises, setFranchises] = useState([])
@@ -92,6 +94,9 @@ export function AdminDashboard({ user }: { user: any }) {
           <TabsTrigger value="franchise-inventory" className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none">
             Franchise Inventory
           </TabsTrigger>
+          <TabsTrigger value="day-wise-usage" className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none">
+            Day-wise Usage
+          </TabsTrigger>
         </TabsList>
       </div>
       <TabsContent value="franchises">
@@ -118,6 +123,9 @@ export function AdminDashboard({ user }: { user: any }) {
       </TabsContent>
       <TabsContent value="franchise-inventory">
         <FranchiseInventoryView />
+      </TabsContent>
+      <TabsContent value="day-wise-usage">
+        <DayWiseInventoryUsage />
       </TabsContent>
     </Tabs>
   )

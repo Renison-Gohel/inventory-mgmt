@@ -3,23 +3,20 @@
 import { ColumnDef } from "@tanstack/react-table"
 
 export type InventoryItem = {
-  id: string
   item_id: string
+  name: string
+  description: string
   quantity: number
   threshold: number
-  inventory_items: {
-    name: string
-    description: string
-  }
 }
 
 export const columns: ColumnDef<InventoryItem>[] = [
   {
-    accessorKey: "inventory_items.name",
+    accessorKey: "name",
     header: "Item Name",
   },
   {
-    accessorKey: "inventory_items.description",
+    accessorKey: "description",
     header: "Description",
   },
   {

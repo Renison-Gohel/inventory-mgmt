@@ -13,7 +13,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from 'lucide-react'
@@ -24,6 +23,10 @@ const columns = [
   {
     accessorKey: "name",
     header: "Item Name",
+  },
+  {
+    accessorKey: "description",
+    header: "Description",
   },
   {
     accessorKey: "quantity",
@@ -105,7 +108,7 @@ export function FranchiseDashboard({ user }: { user: any }) {
 
     // Set up real-time listener for inventory changes
     const inventorySubscription = supabase
-      .channel('franchise-inventory-changes')
+      .channel('inventory_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'franchise_inventory' }, () => {
         if (franchise) {
           fetchInventory(franchise.id)
@@ -116,15 +119,12 @@ export function FranchiseDashboard({ user }: { user: any }) {
     return () => {
       inventorySubscription.unsubscribe()
     }
-  }, [user.id, franchise])
+  }, [user.id])
 
   const handleRecordUsage = async (e: React.FormEvent) => {
     e.preventDefault()
     if (selectedItem && franchise) {
       try {
-        if (usageAmount > selectedItem.quantity) {
-          throw new Error("Usage amount cannot exceed current quantity")
-        }
         await recordInventoryUsage(franchise.id, selectedItem.item_id, usageAmount, new Date().toISOString())
         setIsUsageDialogOpen(false)
         setSelectedItem(null)
@@ -136,7 +136,6 @@ export function FranchiseDashboard({ user }: { user: any }) {
         await fetchInventory(franchise.id)
       } catch (err) {
         console.error('Error recording usage:', err)
-        setError('Failed to record usage. Please try again.')
         toast({
           title: "Error",
           description: err.message || "Failed to record usage. Please try again.",
@@ -160,7 +159,6 @@ export function FranchiseDashboard({ user }: { user: any }) {
         })
       } catch (err) {
         console.error('Error requesting inventory:', err)
-        setError('Failed to request inventory. Please try again.')
         toast({
           title: "Error",
           description: "Failed to request inventory. Please try again.",

@@ -1,4 +1,5 @@
 // @ts-nocheck
+
 "use client"
 
 import { useState, useEffect } from "react"
@@ -48,8 +49,12 @@ export function FranchiseInventoryView() {
 
     // Set up real-time listener for inventory changes
     const inventorySubscription = supabase
-      .channel('franchise-inventory-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'franchise_inventory' }, fetchInventory)
+      .channel('inventory_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'franchise_inventory' }, () => {
+        if (selectedFranchise) {
+          fetchInventory()
+        }
+      })
       .subscribe()
 
     return () => {

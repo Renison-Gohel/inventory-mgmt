@@ -4,8 +4,9 @@
 
 import { useState, useEffect } from "react"
 import { supabase } from "@/utils/supabase"
-import { updateInventoryRequestStatus } from "@/utils/db"
+import { fulfillInventoryRequest } from "@/utils/db"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -16,10 +17,13 @@ import {
 } from "@/components/ui/table"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from 'lucide-react'
+import { useToast } from "@/components/ui/use-toast"
 
 export default function InventoryRequests() {
   const [requests, setRequests] = useState([])
   const [error, setError] = useState<string | null>(null)
+  const [fulfilledQuantities, setFulfilledQuantities] = useState({})
+  const { toast } = useToast()
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -46,15 +50,42 @@ export default function InventoryRequests() {
 
   const handleUpdateStatus = async (requestId: string, status: 'Fulfilled' | 'Rejected') => {
     try {
-      await updateInventoryRequestStatus(requestId, status)
+      if (status === 'Fulfilled') {
+        const fulfilledQuantity = fulfilledQuantities[requestId]
+        if (!fulfilledQuantity) {
+          toast({
+            title: "Error",
+            description: "Please enter a fulfilled quantity.",
+            variant: "destructive",
+          })
+          return
+        }
+        await fulfillInventoryRequest(requestId, fulfilledQuantity)
+      } else {
+        // For rejected requests, we'll just update the status
+        await supabase
+          .from('inventory_requests')
+          .update({ status })
+          .eq('id', requestId)
+      }
+      
       // Refresh requests
       const updatedRequests = requests.map(request =>
         request.id === requestId ? { ...request, status } : request
       )
       setRequests(updatedRequests)
+      
+      toast({
+        title: "Success",
+        description: `Request ${status.toLowerCase()} successfully.`,
+      })
     } catch (err) {
       console.error('Error updating request status:', err)
-      setError('Failed to update request status. Please try again.')
+      toast({
+        title: "Error",
+        description: "Failed to update request status. Please try again.",
+        variant: "destructive",
+      })
     }
   }
 
@@ -76,7 +107,7 @@ export default function InventoryRequests() {
           <TableRow>
             <TableHead>Franchise</TableHead>
             <TableHead>Item</TableHead>
-            <TableHead>Quantity</TableHead>
+            <TableHead>Quantity Requested</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
@@ -91,6 +122,15 @@ export default function InventoryRequests() {
               <TableCell>
                 {request.status === 'Pending' && (
                   <>
+                    <Input
+                      type="number"
+                      placeholder="Fulfilled Quantity"
+                      className="w-40 mr-2 mb-2"
+                      onChange={(e) => setFulfilledQuantities({
+                        ...fulfilledQuantities,
+                        [request.id]: parseInt(e.target.value)
+                      })}
+                    />
                     <Button
                       variant="outline"
                       size="sm"
