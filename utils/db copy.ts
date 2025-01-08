@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { supabase } from './supabase'
 
 export async function getFranchises() {
@@ -122,38 +120,18 @@ export async function updateFranchiseInventory(
   try {
     const { data, error } = await supabase
       .from('franchise_inventory')
-      .upsert(
-        {
-          franchise_id: franchiseId,
-          item_id: itemId,
-          quantity,
-          threshold
-        },
-        {
-          onConflict: 'franchise_id,item_id',
-          ignoreDuplicates: false
-        }
-      )
+      .upsert({
+        franchise_id: franchiseId,
+        item_id: itemId,
+        quantity,
+        threshold
+      })
       .select()
     
     if (error) throw error
     return data[0]
   } catch (error) {
     console.error('Error updating franchise inventory:', error)
-    throw error
-  }
-}
-
-export async function deleteFranchiseInventoryItem(id: string) {
-  try {
-    const { error } = await supabase
-      .from('franchise_inventory')
-      .delete()
-      .eq('id', id)
-    
-    if (error) throw error
-  } catch (error) {
-    console.error('Error deleting franchise inventory item:', error)
     throw error
   }
 }
@@ -249,19 +227,12 @@ export async function updateFranchiseOwner(franchiseId: string, ownerEmail: stri
 
 export async function getRealTimeInventory(franchiseId: string) {
   try {
-    const { data, error } = await supabase
-      .from('franchise_inventory')
-      .select(`
-        *,
-        inventory_items (id, name)
-      `)
-      .eq('franchise_id', franchiseId)
+    const { data, error } = await supabase.rpc('get_real_time_inventory', {
+      p_franchise_id: franchiseId
+    })
     
     if (error) throw error
-    return data.map(item => ({
-      ...item,
-      name: item.inventory_items.name,
-    }))
+    return data
   } catch (error) {
     console.error('Error fetching real-time inventory:', error)
     throw error
@@ -294,7 +265,7 @@ export async function getDayWiseInventoryUsage(franchiseId: string, startDate: s
     if (error) throw error
 
     // Convert BIGINT to number for JavaScript compatibility
-    return data.map(item => ({
+    return data.map((item: { quantity_used: string | number }) => ({
       ...item,
       quantity_used: Number(item.quantity_used)
     }))
@@ -304,32 +275,21 @@ export async function getDayWiseInventoryUsage(franchiseId: string, startDate: s
   }
 }
 
-export async function updateFranchise(id: string, name: string, location: string) {
-  try {
-    const { data, error } = await supabase
-      .from('franchises')
-      .update({ name, location })
-      .eq('id', id)
-      .select()
-    
-    if (error) throw error
-    return data[0]
-  } catch (error) {
-    console.error('Error updating franchise:', error)
-    throw error
-  }
-}
+// export {
+//   getFranchises,
+//   createFranchise,
+//   getInventoryItems,
+//   createInventoryItem,
+//   updateInventoryItem,
+//   deleteInventoryItem,
+//   getFranchiseInventory,
+//   updateFranchiseInventory,
+//   recordInventoryUsage,
+//   createInventoryRequest,
+//   updateInventoryRequestStatus,
+//   updateFranchiseOwner,
+//   getRealTimeInventory,
+//   fulfillInventoryRequest,
+//   getDayWiseInventoryUsage
+// }
 
-export async function deleteFranchise(id: string) {
-  try {
-    const { error } = await supabase
-      .from('franchises')
-      .delete()
-      .eq('id', id)
-    
-    if (error) throw error
-  } catch (error) {
-    console.error('Error deleting franchise:', error)
-    throw error
-  }
-}

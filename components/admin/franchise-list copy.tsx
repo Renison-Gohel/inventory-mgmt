@@ -1,4 +1,7 @@
-import { useState } from "react"
+// @ts-nocheck
+
+import { useEffect, useState } from 'react';
+import { supabase } from '@/utils/supabase';
 import { createFranchise, updateFranchiseOwner, getFranchises } from "@/utils/db"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,6 +16,14 @@ import {
 } from "@/components/ui/dialog"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from 'lucide-react'
+
+type Franchise = {
+  id: string;
+  name: string;
+  location: string;
+  owner_id: string;
+  owner: { email: string } | null;
+};
 
 // Define columns for the DataTable
 const columns = [
@@ -49,6 +60,31 @@ export function FranchiseList({ franchises, onFranchiseCreated, onOperationResul
   const [error, setError] = useState<string | null>(null)
   const [assigningOwner, setAssigningOwner] = useState<any>(null)
   const [ownerEmail, setOwnerEmail] = useState("")
+  const [franchiseList, setFranchiseList] = useState<Franchise[]>([]);
+
+  useEffect(() => {
+    const fetchFranchises = async () => {
+      const { data: franchisesData, error } = await supabase
+        .from('franchises')
+        .select(`
+          id,
+          name,
+          location,
+          owner_id,
+          owner:user_info ( email )
+        `);
+
+      if (error) {
+        console.error('Error fetching franchises:', error);
+      } else {
+        setFranchiseList(franchisesData);
+        console.log('Franchises: ', franchisesData);
+        
+      }
+    };
+
+    fetchFranchises();
+  }, []);
 
   const handleCreateFranchise = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -82,8 +118,9 @@ export function FranchiseList({ franchises, onFranchiseCreated, onOperationResul
     }
   }
 
-  const franchisesWithActions = franchises.map(franchise => ({
+  const franchisesWithActions = franchiseList.map(franchise => ({
     ...franchise,
+    owner_email: franchise.owner?.email || null,
     onAssignOwner: setAssigningOwner
   }))
 
@@ -161,4 +198,6 @@ export function FranchiseList({ franchises, onFranchiseCreated, onOperationResul
     </div>
   )
 }
+
+export default FranchiseList;
 

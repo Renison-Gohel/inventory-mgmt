@@ -21,7 +21,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from 'lucide-react'
 
-export function InventoryItemsCRUD({ inventoryItems, onItemsChanged, onOperationResult }: { inventoryItems: any[], onItemsChanged: () => void, onOperationResult: (success: boolean, operation: string, itemType: string) => void }) {
+export function InventoryItemsCRUD({ inventoryItems, onItemsChanged }: { inventoryItems: any[], onItemsChanged: () => void }) {
   const [newItem, setNewItem] = useState({ name: "", description: "" })
   const [editingItem, setEditingItem] = useState<any>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -35,11 +35,9 @@ export function InventoryItemsCRUD({ inventoryItems, onItemsChanged, onOperation
       setNewItem({ name: "", description: "" })
       setIsDialogOpen(false)
       onItemsChanged()
-      onOperationResult(true, "created", "Inventory Item")
     } catch (err) {
       console.error('Error creating inventory item:', err)
       setError('Failed to create inventory item. Please try again.')
-      onOperationResult(false, "create", "Inventory Item")
     }
   }
 
@@ -51,11 +49,9 @@ export function InventoryItemsCRUD({ inventoryItems, onItemsChanged, onOperation
       setEditingItem(null)
       setIsDialogOpen(false)
       onItemsChanged()
-      onOperationResult(true, "updated", "Inventory Item")
     } catch (err) {
       console.error('Error updating inventory item:', err)
       setError('Failed to update inventory item. Please try again.')
-      onOperationResult(false, "update", "Inventory Item")
     }
   }
 
@@ -64,11 +60,9 @@ export function InventoryItemsCRUD({ inventoryItems, onItemsChanged, onOperation
     try {
       await deleteInventoryItem(id)
       onItemsChanged()
-      onOperationResult(true, "deleted", "Inventory Item")
     } catch (err) {
       console.error('Error deleting inventory item:', err)
       setError('Failed to delete inventory item. Please try again.')
-      onOperationResult(false, "delete", "Inventory Item")
     }
   }
 
@@ -78,7 +72,7 @@ export function InventoryItemsCRUD({ inventoryItems, onItemsChanged, onOperation
         <h2 className="text-xl font-semibold">Inventory Items</h2>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => setEditingItem(null)}>Add Item</Button>
+            <Button>Add Item</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
