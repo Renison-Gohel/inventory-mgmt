@@ -34,9 +34,11 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="min-h-screen bg-background">
+          <div className="flex flex-col min-h-screen">
             <Navbar session={session} />
-            <main className="container mx-auto py-4">{children}</main>
+            <main className="flex-grow container mx-auto px-4 py-8">
+              {children}
+            </main>
           </div>
           <Toaster />
         </ThemeProvider>

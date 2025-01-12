@@ -18,9 +18,15 @@ export default function Dashboard() {
     const fetchUser = async () => {
       try {
         const { data: { user }, error } = await supabase.auth.getUser()
-        if (error) throw error
+        // if (error) throw error
+        if (error){
+          console.log('Error fetching user: ', error);
+          
+        }
         if (user) {
           setUser(user)
+          console.log('User: ', user);
+          
         } else {
           router.push("/")
         }
@@ -35,7 +41,10 @@ export default function Dashboard() {
   const handleSignOut = async () => {
     try {
       const { error } = await supabase.auth.signOut()
-      if (error) throw error
+      // if (error) throw error
+      if (error){
+        console.log('Error signing out: ', error);
+      }
       router.push("/")
     } catch (err) {
       console.error('Error signing out:', err)
